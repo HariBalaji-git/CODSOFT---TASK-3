@@ -1,0 +1,45 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report
+
+# Load the Iris dataset from a CSV file
+df = pd.read_csv('IRIS.csv')
+
+# Display the first few rows of the dataset
+print("First few rows of the dataset:")
+print(df.head())
+
+# Prepare the data
+X = df.iloc[:, :-1]  # Features (all columns except the last one)
+y = df.iloc[:, -1]   # Target variable (last column)
+
+# Encode the target variable if it's categorical
+le = LabelEncoder()
+y = le.fit_transform(y)
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Initialize and train the Decision Tree Classifier
+model = DecisionTreeClassifier()
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+print(f'\nAccuracy: {accuracy:.2f}')
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred, target_names=le.classes_))
+
+# Save the results to a CSV file
+results = pd.DataFrame({
+    'Actual': le.inverse_transform(y_test),
+    'Predicted': le.inverse_transform(y_pred)
+})
+results.to_csv('iris_predictions.csv', index=False)
+
+print("\nPredictions saved to 'iris_predictions.csv'")
